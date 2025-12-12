@@ -32,11 +32,11 @@ if "sec_section" not in st.session_state:
 # --- TOP NAVIGATION ---
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("📊 View Incidents", use_container_width=True): st.session_state.sec_section = "View"
+    if st.button("View Incidents", use_container_width=True): st.session_state.sec_section = "View"
 with col2:
-    if st.button("🛠️ Manage Records", use_container_width=True): st.session_state.sec_section = "Manage"
+    if st.button("Manage Records", use_container_width=True): st.session_state.sec_section = "Manage"
 with col3:
-    if st.button("🤖 AI Assistant", use_container_width=True): st.session_state.sec_section = "AI"
+    if st.button("AI Assistant", use_container_width=True): st.session_state.sec_section = "AI"
 
 st.divider()
 
@@ -65,7 +65,7 @@ if st.session_state.sec_section == "View":
         col_g1, col_g2 = st.columns(2)
         
         with col_g1:
-            st.subheader("📈 Attack Trend (Over Time)")
+            st.subheader(" Attack Trend (Over Time)")
             if "Date" in df.columns:
                 df["Date"] = pd.to_datetime(df["Date"])
                 # Group by date to show timeline
@@ -81,14 +81,14 @@ if st.session_state.sec_section == "View":
             st.bar_chart(type_counts, color="#FFA500") # Orange Bars
 
         st.divider()
-        st.subheader("📋 Detailed Incident Log")
+        st.subheader(" Detailed Incident Log")
         st.dataframe(df, use_container_width=True)
     else:
         st.info("No data available.")
 
 # --- SECTION 2: MANAGE DATA ---
 elif st.session_state.sec_section == "Manage":
-    tab_add, tab_upd, tab_del = st.tabs(["➕ Add Incident", "🔄 Update Status", "❌ Delete"])
+    tab_add, tab_upd, tab_del = st.tabs(["Add Incident", "Update Status", "Delete"])
     
     with tab_add:
         with st.form("add_inc"):
@@ -123,5 +123,5 @@ elif st.session_state.sec_section == "Manage":
 
 # --- SECTION 3: AI ASSISTANT ---
 elif st.session_state.sec_section == "AI":
-    st.subheader("🤖 Security Analyst Chat")
+    st.subheader("Security Analyst Chat")
     chatbot.display_chat()

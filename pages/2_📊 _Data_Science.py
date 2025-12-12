@@ -33,11 +33,11 @@ if "ds_section" not in st.session_state:
 # --- TOP NAVIGATION ---
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("📊 View Datasets", use_container_width=True): st.session_state.ds_section = "View"
+    if st.button("View Datasets", use_container_width=True): st.session_state.ds_section = "View"
 with col2:
-    if st.button("🛠️ Manage Data", use_container_width=True): st.session_state.ds_section = "Manage"
+    if st.button("Manage Data", use_container_width=True): st.session_state.ds_section = "Manage"
 with col3:
-    if st.button("🤖 AI Assistant", use_container_width=True): st.session_state.ds_section = "AI"
+    if st.button("AI Assistant", use_container_width=True): st.session_state.ds_section = "AI"
 
 st.divider()
 
@@ -85,14 +85,14 @@ if st.session_state.ds_section == "View":
             )
 
         st.divider()
-        st.subheader("📋 Dataset Registry")
+        st.subheader("Dataset Registry")
         st.dataframe(df, use_container_width=True)
     else:
         st.info("No datasets registered.")
 
 # --- SECTION 2: MANAGE DATA ---
 elif st.session_state.ds_section == "Manage":
-    tab_add, tab_upd, tab_del = st.tabs(["➕ Register Dataset", "🔄 Update Count", "❌ Delete"])
+    tab_add, tab_upd, tab_del = st.tabs(["Register Dataset", "Update Count", "Delete"])
 
     with tab_add:
         with st.form("add_ds"):
@@ -130,5 +130,5 @@ elif st.session_state.ds_section == "Manage":
 
 # --- SECTION 3: AI ASSISTANT ---
 elif st.session_state.ds_section == "AI":
-    st.subheader("🤖 Data Science Assistant")
+    st.subheader(" Data Science Assistant")
     chatbot.display_chat()

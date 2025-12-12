@@ -33,11 +33,11 @@ if "it_section" not in st.session_state:
 # --- TOP NAVIGATION ---
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("📊 View Tickets", use_container_width=True): st.session_state.it_section = "View"
+    if st.button("View Tickets", use_container_width=True): st.session_state.it_section = "View"
 with col2:
-    if st.button("🛠️ Manage Tickets", use_container_width=True): st.session_state.it_section = "Manage"
+    if st.button("Manage Tickets", use_container_width=True): st.session_state.it_section = "Manage"
 with col3:
-    if st.button("🤖 AI Assistant", use_container_width=True): st.session_state.it_section = "AI"
+    if st.button("AI Assistant", use_container_width=True): st.session_state.it_section = "AI"
 
 st.divider()
 
@@ -82,14 +82,14 @@ if st.session_state.it_section == "View":
             st.bar_chart(prio_counts, color="#E74C3C")
 
         st.divider()
-        st.subheader("📋 Ticket Queue")
+        st.subheader("Ticket Queue")
         st.dataframe(df, use_container_width=True)
     else:
         st.info("No tickets found.")
 
 # --- SECTION 2: MANAGE DATA ---
 elif st.session_state.it_section == "Manage":
-    tab_add, tab_upd, tab_del = st.tabs(["➕ Create Ticket", "🔄 Update Status", "❌ Delete"])
+    tab_add, tab_upd, tab_del = st.tabs(["Create Ticket", "Update Status", "Delete"])
 
     with tab_add:
         with st.form("add_tick"):
@@ -126,5 +126,5 @@ elif st.session_state.it_section == "Manage":
 
 # --- SECTION 3: AI ASSISTANT ---
 elif st.session_state.it_section == "AI":
-    st.subheader("🤖 IT Support Assistant")
+    st.subheader("IT Support Assistant")
     chatbot.display_chat()
