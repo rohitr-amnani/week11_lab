@@ -7,6 +7,7 @@ from services.ai_assistant import AIAssistant
 
 st.set_page_config(page_title="Data Science", layout="wide")
 
+# Check Authentication
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
     st.error("Please login first.")
     st.stop()
@@ -20,7 +21,6 @@ dataset_repo = DatasetRepository(db_manager)
 # Initialize AI
 if "chatbot_ds" not in st.session_state:
     st.session_state.chatbot_ds = AIAssistant(
-        api_key="sk-proj-...", 
         system_role="You are a data science expert skilled in Python, SQL, and Statistics.",
         session_key="data_messages",
         role_name="Data Science"
@@ -30,7 +30,7 @@ chatbot = st.session_state.chatbot_ds
 if "ds_section" not in st.session_state:
     st.session_state.ds_section = "View"
 
-# --- TOP NAVIGATION ---
+# making the top navigation
 col1, col2, col3 = st.columns(3)
 with col1:
     if st.button("View Datasets", use_container_width=True): st.session_state.ds_section = "View"
@@ -44,7 +44,7 @@ st.divider()
 # Fetch Data
 datasets = dataset_repo.get_all_datasets()
 
-# --- SECTION 1: VIEW DATA ---
+#view data section
 if st.session_state.ds_section == "View":
     if datasets:
         data = [d.to_dict() for d in datasets]
@@ -62,7 +62,7 @@ if st.session_state.ds_section == "View":
 
         st.divider()
 
-        # --- GRAPHS ---
+        #GRAPHS
         col_g1, col_g2 = st.columns(2)
         
         with col_g1:
@@ -74,14 +74,13 @@ if st.session_state.ds_section == "View":
         with col_g2:
             st.subheader("⚖️ Size vs. Records Analysis")
             # Scatter chart to see correlation between size and rows
-            # Rename columns to map easily if needed, but st.scatter_chart auto-detects
             chart_data = df[["Record Count", "Size (MB)", "Category"]]
             st.scatter_chart(
                 chart_data,
                 x="Record Count",
                 y="Size (MB)",
                 color="Category",
-                size="Size (MB)" # Bubbles are bigger if file is bigger
+                size="Size (MB)"
             )
 
         st.divider()
@@ -90,10 +89,11 @@ if st.session_state.ds_section == "View":
     else:
         st.info("No datasets registered.")
 
-# --- SECTION 2: MANAGE DATA ---
+# manage data section
 elif st.session_state.ds_section == "Manage":
     tab_add, tab_upd, tab_del = st.tabs(["Register Dataset", "Update Count", "Delete"])
 
+    # Add Dataset Tab
     with tab_add:
         with st.form("add_ds"):
             col_a, col_b = st.columns(2)
@@ -110,6 +110,7 @@ elif st.session_state.ds_section == "Manage":
                 dataset_repo.insert_dataset(name, cat, src, str(datetime.date.today()), cnt, size)
                 st.success("Registered!"); st.rerun()
 
+    # Update Record Count Tab
     with tab_upd:
         if datasets:
             opts = {f"{d.get_name()}": d for d in datasets}
@@ -120,6 +121,7 @@ elif st.session_state.ds_section == "Manage":
                 dataset_repo.update_dataset_record_count(obj.get_id(), nc)
                 st.success("Updated!"); st.rerun()
 
+    # Delete Dataset Tab
     with tab_del:
         if datasets:
             ids = [d.get_id() for d in datasets]
@@ -128,7 +130,7 @@ elif st.session_state.ds_section == "Manage":
                 dataset_repo.delete_dataset(did)
                 st.success("Deleted."); st.rerun()
 
-# --- SECTION 3: AI ASSISTANT ---
+#call AI Assistant
 elif st.session_state.ds_section == "AI":
     st.subheader(" Data Science Assistant")
     chatbot.display_chat()

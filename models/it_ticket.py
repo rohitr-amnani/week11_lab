@@ -1,6 +1,8 @@
 from services.database_manager import DatabaseManager
 
+#create ITTicket class
 class ITTicket:
+    #init method
     def __init__(self, ticket_id: int, display_id: str, subject: str, priority: str, status: str, category: str, description: str, created_date: str, resolved_date: str, assigned_to: str):
         self.__id = ticket_id
         self.__display_id = display_id
@@ -43,6 +45,7 @@ class ITTicket:
     def get_assigned_to(self) -> str:
         return self.__assigned_to
 
+    #creatimg dictionary representation to facilitate DataFrame conversion
     def to_dict(self):
         return {
             "Internal ID": self.__id,
@@ -57,10 +60,14 @@ class ITTicket:
             "Assigned To": self.__assigned_to
         }
 
+#create TicketRepository class
 class TicketRepository:
+    
+    #init method
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
 
+    #insert ticket method
     def insert_ticket(self, ticket_id_str, priority, status, category, subject, description, created_date):
         query = """
             INSERT INTO it_tickets 
@@ -69,6 +76,7 @@ class TicketRepository:
         """
         self.db.execute_query(query, (ticket_id_str, priority, status, category, subject, description, created_date, "Unassigned"))
 
+    #read all tickets method
     def get_all_tickets(self):
         query = "SELECT * FROM it_tickets ORDER BY id DESC"
         df = self.db.fetch_data(query)
@@ -90,8 +98,10 @@ class TicketRepository:
                 ))
         return tickets
 
+    #update ticket status method
     def update_ticket_status(self, id, status):
         self.db.execute_query("UPDATE it_tickets SET status = ? WHERE id = ?", (status, id))
 
+    #delete ticket method
     def delete_ticket(self, id):
         self.db.execute_query("DELETE FROM it_tickets WHERE id = ?", (id,))

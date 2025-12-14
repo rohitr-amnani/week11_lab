@@ -6,6 +6,7 @@ from services.ai_assistant import AIAssistant
 
 st.set_page_config(page_title="Cybersecurity", layout="wide")
 
+# Check Authentication
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
     st.error("Please login first.")
     st.stop()
@@ -19,7 +20,6 @@ incident_repo = Incident(db_manager)
 # Initialize AI
 if "chatbot_sec" not in st.session_state:
     st.session_state.chatbot_sec = AIAssistant(
-        api_key="sk-proj-...", 
         system_role="You are a cybersecurity expert specializing in threat analysis.",
         session_key="cyber_messages",
         role_name="Cybersecurity"
@@ -29,7 +29,7 @@ chatbot = st.session_state.chatbot_sec
 if "sec_section" not in st.session_state:
     st.session_state.sec_section = "View"
 
-# --- TOP NAVIGATION ---
+# making the top navigation
 col1, col2, col3 = st.columns(3)
 with col1:
     if st.button("View Incidents", use_container_width=True): st.session_state.sec_section = "View"
@@ -43,7 +43,7 @@ st.divider()
 # Fetch Data
 incidents_list = incident_repo.get_all_incidents()
 
-# --- SECTION 1: VIEW DATA ---
+#View Data Section
 if st.session_state.sec_section == "View":
     if incidents_list:
         data = [i.to_dict() for i in incidents_list]
@@ -61,7 +61,7 @@ if st.session_state.sec_section == "View":
         
         st.divider()
 
-        # --- GRAPHS ---
+        #GRAPHS
         col_g1, col_g2 = st.columns(2)
         
         with col_g1:
@@ -70,7 +70,7 @@ if st.session_state.sec_section == "View":
                 df["Date"] = pd.to_datetime(df["Date"])
                 # Group by date to show timeline
                 trend_data = df.groupby("Date").size()
-                st.line_chart(trend_data, color="#FF4B4B") # Red Line
+                st.line_chart(trend_data, color="#FF4B4B")
             else:
                 st.info("Date data unavailable for trend.")
 
@@ -78,7 +78,7 @@ if st.session_state.sec_section == "View":
             st.subheader("🛡️ Incidents by Type")
             # Bar chart for categorical comparison
             type_counts = df["Incident Type"].value_counts()
-            st.bar_chart(type_counts, color="#FFA500") # Orange Bars
+            st.bar_chart(type_counts, color="#FFA500")
 
         st.divider()
         st.subheader(" Detailed Incident Log")
@@ -86,10 +86,11 @@ if st.session_state.sec_section == "View":
     else:
         st.info("No data available.")
 
-# --- SECTION 2: MANAGE DATA ---
+# Manage Data Section
 elif st.session_state.sec_section == "Manage":
     tab_add, tab_upd, tab_del = st.tabs(["Add Incident", "Update Status", "Delete"])
     
+    # Add Incident Tab
     with tab_add:
         with st.form("add_inc"):
             date = st.date_input("Date")
@@ -103,6 +104,7 @@ elif st.session_state.sec_section == "Manage":
                 incident_repo.insert_incident(str(date), typ, sev, stat, desc, reporter)
                 st.success("Added!"); st.rerun()
 
+    # Update Status Tab
     with tab_upd:
         if incidents_list:
             opts = {f"{i.get_type()} (ID: {i.get_id()})": i for i in incidents_list}
@@ -113,6 +115,7 @@ elif st.session_state.sec_section == "Manage":
                 incident_repo.update_incident_status(obj.get_id(), new_s)
                 st.success("Updated!"); st.rerun()
 
+    # Delete Incident Tab
     with tab_del:
         if incidents_list:
             ids = [i.get_id() for i in incidents_list]
@@ -121,7 +124,7 @@ elif st.session_state.sec_section == "Manage":
                 incident_repo.delete_incident(did)
                 st.success("Deleted."); st.rerun()
 
-# --- SECTION 3: AI ASSISTANT ---
+#call AI Assistant
 elif st.session_state.sec_section == "AI":
     st.subheader("Security Analyst Chat")
     chatbot.display_chat()

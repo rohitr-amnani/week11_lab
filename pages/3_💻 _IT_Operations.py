@@ -7,6 +7,7 @@ from services.ai_assistant import AIAssistant
 
 st.set_page_config(page_title="IT Operations", layout="wide")
 
+# Check Authentication
 if "logged_in" not in st.session_state or not st.session_state.logged_in:
     st.error("Please login first.")
     st.stop()
@@ -20,7 +21,6 @@ ticket_repo = TicketRepository(db_manager)
 # Initialize AI
 if "chatbot_it" not in st.session_state:
     st.session_state.chatbot_it = AIAssistant(
-        api_key="sk-proj-...", 
         system_role="You are an IT Support specialist. Be concise and technical.",
         session_key="it_messages",
         role_name="IT Support"
@@ -30,7 +30,7 @@ chatbot = st.session_state.chatbot_it
 if "it_section" not in st.session_state:
     st.session_state.it_section = "View"
 
-# --- TOP NAVIGATION ---
+# making the top navigation
 col1, col2, col3 = st.columns(3)
 with col1:
     if st.button("View Tickets", use_container_width=True): st.session_state.it_section = "View"
@@ -44,7 +44,7 @@ st.divider()
 # Fetch Data
 tickets = ticket_repo.get_all_tickets()
 
-# --- SECTION 1: VIEW DATA ---
+# view data section
 if st.session_state.it_section == "View":
     if tickets:
         data = [t.to_dict() for t in tickets]
@@ -62,12 +62,11 @@ if st.session_state.it_section == "View":
 
         st.divider()
 
-        # --- GRAPHS ---
+        #GRAPHS
         col_g1, col_g2 = st.columns(2)
         
         with col_g1:
             st.subheader("🌊 Ticket Volume (Area Chart)")
-            # Convert created date and count frequency
             if "Created Date" in df.columns:
                 df["Created Date"] = pd.to_datetime(df["Created Date"])
                 daily_tickets = df.groupby("Created Date").size()
@@ -76,6 +75,7 @@ if st.session_state.it_section == "View":
             else:
                 st.info("No Date data for volume analysis.")
 
+        # bar chart for priority distribution
         with col_g2:
             st.subheader("🚦 Priority Distribution")
             prio_counts = df["Priority"].value_counts()
@@ -87,10 +87,11 @@ if st.session_state.it_section == "View":
     else:
         st.info("No tickets found.")
 
-# --- SECTION 2: MANAGE DATA ---
+# manage data section
 elif st.session_state.it_section == "Manage":
     tab_add, tab_upd, tab_del = st.tabs(["Create Ticket", "Update Status", "Delete"])
 
+    # Add Ticket Tab
     with tab_add:
         with st.form("add_tick"):
             col_a, col_b = st.columns(2)
@@ -106,6 +107,7 @@ elif st.session_state.it_section == "Manage":
                 ticket_repo.insert_ticket(tid, pri, "Open", cat, sub, dsc, str(datetime.date.today()))
                 st.success("Created!"); st.rerun()
 
+    # Update Status Tab
     with tab_upd:
         if tickets:
             opts = {f"{t.get_subject()} (ID: {t.get_id()})": t for t in tickets}
@@ -116,6 +118,7 @@ elif st.session_state.it_section == "Manage":
                 ticket_repo.update_ticket_status(obj.get_id(), ns)
                 st.success("Updated!"); st.rerun()
 
+    # Delete Ticket Tab
     with tab_del:
         if tickets:
             ids = [t.get_id() for t in tickets]
@@ -124,7 +127,7 @@ elif st.session_state.it_section == "Manage":
                 ticket_repo.delete_ticket(did)
                 st.success("Deleted."); st.rerun()
 
-# --- SECTION 3: AI ASSISTANT ---
+# AI Assistant Section
 elif st.session_state.it_section == "AI":
     st.subheader("IT Support Assistant")
     chatbot.display_chat()

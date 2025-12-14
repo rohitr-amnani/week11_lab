@@ -1,5 +1,6 @@
 from services.database_manager import DatabaseManager
 
+#create Dataset class
 class Dataset:
     def __init__(self, dataset_id: int, name: str, size_mb: float, rows: int, source: str, category: str, last_updated: str):
         self.__id = dataset_id
@@ -10,6 +11,7 @@ class Dataset:
         self.__category = category
         self.__last_updated = last_updated
 
+    #getter methods
     def get_id(self) -> int:
         return self.__id
     
@@ -42,10 +44,14 @@ class Dataset:
             "Size (MB)": self.__size_mb
         }
 
+#create DatasetRepository class
 class DatasetRepository:
+   
+    #init method
     def __init__(self, db_manager: DatabaseManager):
         self.db = db_manager
-
+    
+    #insert dataset method
     def insert_dataset(self, name, category, source, date, count, size_mb):
         query = """
             INSERT INTO datasets_metadata 
@@ -54,6 +60,7 @@ class DatasetRepository:
         """
         self.db.execute_query(query, (name, category, source, date, count, size_mb))
 
+    #read all datasets method
     def get_all_datasets(self):
         query = "SELECT * FROM datasets_metadata ORDER BY id DESC"
         df = self.db.fetch_data(query)
@@ -71,6 +78,11 @@ class DatasetRepository:
                     last_updated=row['last_updated']
                 ))
         return datasets
-        
+    
+    #delete dataset method
     def delete_dataset(self, id):
         self.db.execute_query("DELETE FROM datasets_metadata WHERE id = ?", (id,))
+
+    #update dataset record count method
+    def update_dataset_record_count(self, id, new_count):
+        self.db.execute_query("UPDATE datasets_metadata SET record_count = ? WHERE id = ?", (new_count, id))

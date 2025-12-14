@@ -1,9 +1,11 @@
+# models/users.py
 class User:
     def __init__(self, username: str, password_hash: str, role: str):
         self.__username = username
         self.__password_hash = password_hash
         self.__role = role
 
+    #getter methods
     def get_username(self) -> str:
         return self.__username
 
